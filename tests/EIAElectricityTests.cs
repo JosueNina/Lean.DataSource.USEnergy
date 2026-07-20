@@ -192,6 +192,34 @@ namespace QuantConnect.DataLibrary.Tests
         }
 
         [Test]
+        public void GetSourceReturnsSamePathInLiveMode()
+        {
+            // Live trading resolves the same local file as backtesting, so a daily live run reads the
+            // file the incremental processor appended to.
+            var backtest = new EIAElectricity().GetSource(Config("PJM"), DateTime.UtcNow, false);
+            var live = new EIAElectricity().GetSource(Config("PJM"), DateTime.UtcNow, true);
+
+            Assert.AreEqual(SubscriptionTransportMedium.LocalFile, live.TransportMedium);
+            Assert.AreEqual(backtest.Source, live.Source);
+        }
+
+        [Test]
+        public void ReaderFiresOnAForecastOnlyRow()
+        {
+            // The most recent day is published with only the day-ahead forecast, the rest still empty.
+            // The Reader must still produce a point (so a live algorithm sees the forecast) rather than
+            // dropping the row.
+            var line = "20260720,,2544185,,,,,,,,,,,,,,,,,,";
+            var point = new EIAElectricity().Reader(Config("PJM"), line, DateTime.UtcNow, false) as EIAElectricity;
+
+            Assert.IsNotNull(point);
+            Assert.AreEqual(new DateTime(2026, 7, 20), point.Time);
+            Assert.AreEqual(2544185m, point.DemandForecast);
+            Assert.IsNull(point.Demand);
+            Assert.IsNull(point.NetGeneration);
+        }
+
+        [Test]
         public void FlagsAreCorrect()
         {
             var instance = new EIAElectricity();

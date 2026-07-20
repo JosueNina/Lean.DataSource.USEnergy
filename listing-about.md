@@ -28,7 +28,7 @@ _pjm = AddData<EIAElectricity>(EIA.BalancingAuthorities.PJM, Resolution.Daily).S
 | Data Density | Sparse |
 | Resolution | Daily |
 | Timezone | New York |
-| Data Points | TBD, count from the full backfill |
+| Data Points | 210,512 |
 
 A single `EIAElectricity` class carries everything one balancing authority reports for one day:
 
