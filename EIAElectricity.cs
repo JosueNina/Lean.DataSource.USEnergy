@@ -32,8 +32,8 @@ namespace QuantConnect.DataSource
     public class EIAElectricity : BaseData
     {
         /// <summary>
-        /// The operating day this record covers. Data lands in LEAN at <see cref="EndTime"/>, one day
-        /// later, which is both the end of the bar and once EIA has published the completed day.
+        /// The operating day this record covers. Data lands in LEAN at EndTime, one day later, which
+        /// is both the end of the bar and once EIA has published the completed day.
         /// </summary>
         public TimeSpan Period => QuantConnect.Time.OneDay;
 
