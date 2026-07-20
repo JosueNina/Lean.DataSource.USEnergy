@@ -1,5 +1,80 @@
 # Lean.DataSource.USEnergy
-Example production implementation for our data marketplace United States Energy (EIA) dataset.
+
+Production implementation for the U.S. Energy Information Administration (EIA) datasets. EIA is a
+multi-product provider and this repo is its provider-level home, so it ships more than one dataset:
+
+- **US Energy (petroleum)** — the original dataset: EIA petroleum series (stocks, production, imports,
+  prices) addressed by series id. Class `USEnergy`, data under `alternative/usenergy/`.
+- **EIA Electricity (Form EIA-930)** — hourly U.S. electric grid operations by balancing authority.
+  Class `EIAElectricity`, data under `alternative/eia/electricity/`.
+
+Both are macro signal feeds, not tradeable instruments: an algorithm reads the series and trades a
+separate, tradeable security. Data comes from the public EIA API (free key) and is unlinked.
+
+## EIA Electricity data model
+
+A single `EIAElectricity` class carries everything one balancing authority reports for one hour, in
+wide format:
+
+- **Grid operations** — actual demand, the day-ahead demand forecast, total net generation, and net
+  interchange with neighbouring authorities (positive exports, negative imports).
+- **Fuel mix** — net generation split across all sixteen fuel types the form reports: coal, natural
+  gas, nuclear, hydro, wind, solar, geothermal, petroleum, other and unknown, plus the storage
+  categories (pumped storage, battery, other and unknown storage) and the hybrid renewables (solar and
+  wind with integrated battery storage).
+
+The two API routes behind it, `region-data` and `fuel-type-data`, share the same key (respondent,
+period) and the same hourly cadence, so one subscription gives the whole picture for that authority.
+Every value is in megawatthours and parsed as `decimal?`: a blank cell stays null rather than becoming
+a fake zero, which matters because zero is a real reading (an authority genuinely generating no wind
+at night) and distinct from an authority that has no wind fleet at all.
+
+The three headline metrics balance: net generation minus net interchange equals demand.
+
+## Usage
+
+Balancing authorities are addressed via the generated `EIA.BalancingAuthorities` helper of readable
+named constants, which resolve to the EIA-930 code the files are named after. The major operators also
+carry their common short name (ERCOT, CAISO, NYISO, ISONE, SPP, BPA) alongside the derived one:
+
+```csharp
+// C#
+var pjm = AddData<EIAElectricity>(EIA.BalancingAuthorities.PJM, Resolution.Hour).Symbol;
+```
+
+```python
+# Python
+self.pjm = self.add_data(EIAElectricity, EIA.BalancingAuthorities.PJM, Resolution.HOUR).symbol
+```
+
+## Publication lag
+
+EIA-930 is hourly. `Time` is the operating hour in UTC and `EndTime` is one hour later, which is when
+LEAN fires the data point.
+
+That single hour is not a guess: measured against the live API, the latest published demand hour ran
+exactly one hour behind the wall clock across PJM, ERCOT, CAISO and MISO alike. The lag therefore
+lands on the close of the hourly bar, so the natural bar-close convention is also the point-in-time
+correct one and no artificial offset is needed. There is no CSV column for it.
+
+Worth stating plainly: EIA-930 values are preliminary when first published and get revised over the
+following days. The processor ingests them as published, which is what keeps backtests point-in-time
+honest. The revisions are a property of the source, not a defect in the dataset.
+
+## Processing
+
+`DataProcessing/` holds the C# processor for electricity (`process`). It reads the balancing authority
+list from the live respondent facet, so a new authority is picked up without a code change, and walks
+one authority and one year at a time, paging the API's 5000-row cap, so a failure retries a small
+window instead of the whole backfill. Writes merge idempotently with the published history, which is
+what lets the backfill run in chunks.
+
+`DataProcessing/generate_balancing_authorities.py` regenerates `EIA.BalancingAuthorities.cs` from the
+same facet.
+
+Petroleum processing still lives in `process.ipynb` and is untouched by the electricity work.
 
 # Implementing your own data source
-To learn more about implementing your own data source for our marketplace, visit the [LeanDataSdk](https://github.com/QuantConnect/LeanDataSdk) repository for more information.
+
+To learn more about implementing your own data source for our marketplace, visit the
+[LeanDataSdk](https://github.com/QuantConnect/LeanDataSdk) repository for more information.
