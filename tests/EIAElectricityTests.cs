@@ -27,20 +27,20 @@ namespace QuantConnect.DataLibrary.Tests
     [TestFixture]
     public class EIAElectricityTests
     {
-        // A real PJM hour straight off the API (2024-01-15 00:00 UTC). PJM reports demand, forecast,
-        // net generation, interchange and eight fuels; the geothermal, unknown and storage cells are
-        // empty because PJM does not report them.
+        // A real PJM day straight off the API (2024-01-15, Eastern boundary). PJM reports demand,
+        // forecast, net generation, interchange and eight fuels; the geothermal, unknown and storage
+        // cells are empty because PJM does not report them.
         private const string SampleLine =
-            "20240115 00:00,113297,113196,121696,8403,33245,43401,33784,4144,3632,29,,1272,1434,,,,,,,";
+            "20240115,2740736,2737954,2940472,199817,813443,1139488,809590,58037,43142,11414,,20145,40212,,,,,,,";
 
         private static SubscriptionDataConfig Config(string ticker)
         {
             return new SubscriptionDataConfig(
                 typeof(EIAElectricity),
                 Symbol.Create(ticker, SecurityType.Base, Market.USA),
-                Resolution.Hour,
-                TimeZones.Utc,
-                TimeZones.Utc,
+                Resolution.Daily,
+                TimeZones.NewYork,
+                TimeZones.NewYork,
                 false, false, false);
         }
 
@@ -52,24 +52,24 @@ namespace QuantConnect.DataLibrary.Tests
 
             Assert.IsNotNull(point);
             Assert.AreEqual(config.Symbol, point.Symbol);
-            Assert.AreEqual(new DateTime(2024, 1, 15, 0, 0, 0), point.Time);
+            Assert.AreEqual(new DateTime(2024, 1, 15), point.Time);
 
             // Region metrics. Value tracks net generation.
-            Assert.AreEqual(113297m, point.Demand);
-            Assert.AreEqual(113196m, point.DemandForecast);
-            Assert.AreEqual(121696m, point.NetGeneration);
-            Assert.AreEqual(121696m, point.Value);
-            Assert.AreEqual(8403m, point.TotalInterchange);
+            Assert.AreEqual(2740736m, point.Demand);
+            Assert.AreEqual(2737954m, point.DemandForecast);
+            Assert.AreEqual(2940472m, point.NetGeneration);
+            Assert.AreEqual(2940472m, point.Value);
+            Assert.AreEqual(199817m, point.TotalInterchange);
 
             // Fuel mix.
-            Assert.AreEqual(33245m, point.Coal);
-            Assert.AreEqual(43401m, point.NaturalGas);
-            Assert.AreEqual(33784m, point.Nuclear);
-            Assert.AreEqual(4144m, point.Hydro);
-            Assert.AreEqual(3632m, point.Wind);
-            Assert.AreEqual(29m, point.Solar);
-            Assert.AreEqual(1272m, point.Oil);
-            Assert.AreEqual(1434m, point.Other);
+            Assert.AreEqual(813443m, point.Coal);
+            Assert.AreEqual(1139488m, point.NaturalGas);
+            Assert.AreEqual(809590m, point.Nuclear);
+            Assert.AreEqual(58037m, point.Hydro);
+            Assert.AreEqual(43142m, point.Wind);
+            Assert.AreEqual(11414m, point.Solar);
+            Assert.AreEqual(20145m, point.Oil);
+            Assert.AreEqual(40212m, point.Other);
         }
 
         [Test]
@@ -80,18 +80,19 @@ namespace QuantConnect.DataLibrary.Tests
             var point = new EIAElectricity().Reader(Config("PJM"), SampleLine, DateTime.UtcNow, false) as EIAElectricity;
 
             var implied = point.NetGeneration.Value - point.TotalInterchange.Value;
-            Assert.LessOrEqual(Math.Abs(point.Demand.Value - implied), 10m);
+            // Daily totals are millions of MWh, so allow a small absolute rounding gap.
+            Assert.LessOrEqual(Math.Abs(point.Demand.Value - implied), 500m);
         }
 
         [Test]
-        public void EndTimeIsOneHourAfterTime()
+        public void EndTimeIsOneDayAfterTime()
         {
-            // The hour is published about an hour after it ends, so the bar close is also the
+            // The completed day is published once it is over, so the bar close is also the
             // point-in-time correct delivery moment. LEAN fires the point at EndTime.
             var point = new EIAElectricity().Reader(Config("PJM"), SampleLine, DateTime.UtcNow, false) as EIAElectricity;
 
-            Assert.AreEqual(new DateTime(2024, 1, 15, 1, 0, 0), point.EndTime);
-            Assert.AreEqual(TimeSpan.FromHours(1), point.EndTime - point.Time);
+            Assert.AreEqual(new DateTime(2024, 1, 16), point.EndTime);
+            Assert.AreEqual(TimeSpan.FromDays(1), point.EndTime - point.Time);
         }
 
         [Test]
@@ -99,9 +100,9 @@ namespace QuantConnect.DataLibrary.Tests
         {
             // EndTime is derived, so its setter has to walk Time back by the period rather than
             // clobbering it.
-            var point = new EIAElectricity { EndTime = new DateTime(2024, 1, 15, 1, 0, 0) };
+            var point = new EIAElectricity { EndTime = new DateTime(2024, 1, 16) };
 
-            Assert.AreEqual(new DateTime(2024, 1, 15, 0, 0, 0), point.Time);
+            Assert.AreEqual(new DateTime(2024, 1, 15), point.Time);
         }
 
         [Test]
@@ -126,7 +127,7 @@ namespace QuantConnect.DataLibrary.Tests
         public void NegativeAndZeroValuesParse()
         {
             // Interchange goes negative when importing and storage goes negative while charging.
-            var line = "20240115 00:00,113297,113196,121696,-8403,0,43401,33784,4144,0,29,,1272,1434,,-150,-42,,,,";
+            var line = "20240115,113297,113196,121696,-8403,0,43401,33784,4144,0,29,,1272,1434,,-150,-42,,,,";
             var point = new EIAElectricity().Reader(Config("CISO"), line, DateTime.UtcNow, false) as EIAElectricity;
 
             Assert.AreEqual(-8403m, point.TotalInterchange);
@@ -195,11 +196,11 @@ namespace QuantConnect.DataLibrary.Tests
         {
             var instance = new EIAElectricity();
 
-            Assert.AreEqual(Resolution.Hour, instance.DefaultResolution());
-            Assert.Contains(Resolution.Hour, instance.SupportedResolutions());
+            Assert.AreEqual(Resolution.Daily, instance.DefaultResolution());
+            Assert.Contains(Resolution.Daily, instance.SupportedResolutions());
             Assert.IsFalse(instance.RequiresMapping());
             Assert.IsTrue(instance.IsSparseData());
-            Assert.AreEqual(TimeZones.Utc, instance.DataTimeZone());
+            Assert.AreEqual(TimeZones.NewYork, instance.DataTimeZone());
         }
 
         [Test]

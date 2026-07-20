@@ -33,19 +33,20 @@ namespace QuantConnect.DataProcessing
     /// <summary>
     /// Downloads U.S. electric grid operating data (Form EIA-930) from the EIA API v2 and converts it
     /// to LEAN's per-balancing-authority CSV format. Each balancing authority gets one wide row per
-    /// hour combining the four region-data metrics with the generation split across all sixteen fuel
-    /// types, since both routes share the same key (respondent, period) and the same hourly cadence.
+    /// day combining the four region-data metrics with the generation split across all sixteen fuel
+    /// types, since both routes share the same key (respondent, period) and the same daily cadence.
     ///
     /// Output: {destination}/electricity/{balancingauthority}.csv
     /// Row layout: time,&lt;4 region columns&gt;,&lt;16 fuel columns&gt;
     /// (see EIAElectricity.RegionColumns and EIAElectricity.FuelColumns for the order)
     ///
-    /// Time is the operating hour in UTC. There is no endtime column: EndTime is Time + 1 hour, which
-    /// is both the end of the hourly bar and the measured EIA-930 publication lag.
+    /// Time is the operating day. There is no endtime column: EndTime is Time + 1 day, the end of the
+    /// daily bar. The daily routes publish the same day under several timezone conventions, so we ask
+    /// for the Eastern day boundary to match the dataset's New York data time zone.
     ///
-    /// Full-history mode (no QC_DATAFLEET_DEPLOYMENT_DATE): every hour from 2019 to now, walked one
-    /// balancing authority and one year at a time so a failure retries a small window instead of the
-    /// whole run. Incremental mode (QC_DATAFLEET_DEPLOYMENT_DATE set): just that day, merged
+    /// Full-history mode (no QC_DATAFLEET_DEPLOYMENT_DATE): every day from 2019 to now. The whole
+    /// history is a few thousand rows per authority, well under the API's page cap, so one request per
+    /// route covers it. Incremental mode (QC_DATAFLEET_DEPLOYMENT_DATE set): just that day, merged
     /// idempotently into the published history.
     /// </summary>
     public class EIAElectricityDownloader : IDisposable
@@ -57,13 +58,16 @@ namespace QuantConnect.DataProcessing
         public static string VendorDataName => "electricity";
 
         private const string ApiBaseUrl = "https://api.eia.gov/v2/electricity/rto";
-        private const string RegionRoute = "region-data";
-        private const string FuelRoute = "fuel-type-data";
+        private const string RegionRoute = "daily-region-data";
+        private const string FuelRoute = "daily-fuel-type-data";
+        // The daily routes publish the same day under several timezone conventions. Ask for the Eastern
+        // boundary so the daily total lines up with the dataset's New York data time zone.
+        private const string Timezone = "Eastern";
         // The API caps a JSON response at 5000 rows and warns when the result is truncated.
         private const int PageSize = 5000;
         // Attempts per request before giving up on a balancing authority.
         private const int MaxAttempts = 5;
-        // EIA-930 hourly history starts in mid-2018; 2018 is partial, so we walk from its first full year.
+        // EIA-930 history starts in mid-2018; 2018 is partial, so we walk from its first full year.
         private const int FirstYear = 2019;
 
         private readonly string _destinationDirectory;
@@ -163,7 +167,7 @@ namespace QuantConnect.DataProcessing
         }
 
         /// <summary>
-        /// Fetches every hour for one balancing authority, aligns both routes by period into one wide
+        /// Fetches every day for one balancing authority, aligns both routes by period into one wide
         /// row, and merges the result into that authority's CSV.
         /// </summary>
         private bool ProcessRespondent(string respondent, DateTime start, DateTime end)
@@ -171,31 +175,15 @@ namespace QuantConnect.DataProcessing
             // grid[period] = one value slot per column.
             var grid = new Dictionary<DateTime, string[]>();
 
-            // Walk a quarter at a time. A full-year window is what the API answers with a 503, and a
-            // narrower window also bounds the offset paging and makes a retry cheap.
-            for (var chunkStart = new DateTime(start.Year, ((start.Month - 1) / 3) * 3 + 1, 1);
-                 chunkStart < end;
-                 chunkStart = chunkStart.AddMonths(3))
-            {
-                var windowStart = chunkStart < start ? start : chunkStart;
-                var windowEnd = chunkStart.AddMonths(3);
-                if (windowEnd > end)
-                {
-                    windowEnd = end;
-                }
-                if (windowStart >= windowEnd)
-                {
-                    continue;
-                }
-
-                Collect(grid, RegionRoute, "type", RegionColumnIndex, respondent, windowStart, windowEnd);
-                Collect(grid, FuelRoute, "fueltype", FuelColumnIndex, respondent, windowStart, windowEnd);
-            }
+            // The whole daily history is a few thousand rows per authority, under the page cap, so one
+            // request per route covers it and the paging inside Collect handles any overflow.
+            Collect(grid, RegionRoute, "type", RegionColumnIndex, respondent, start, end);
+            Collect(grid, FuelRoute, "fueltype", FuelColumnIndex, respondent, start, end);
 
             var rows = new List<string>(grid.Count);
             foreach (var (period, values) in grid)
             {
-                // Emit a row when the authority reported at least one series for this hour. Small
+                // Emit a row when the authority reported at least one series for this day. Small
                 // authorities report demand but no fuel split, and storage codes only exist in recent
                 // years, so gating on any single column would silently drop them.
                 if (Array.TrueForAll(values, string.IsNullOrEmpty))
@@ -205,7 +193,7 @@ namespace QuantConnect.DataProcessing
 
                 var line = new List<string>(ColumnCount + 1)
                 {
-                    period.ToString("yyyyMMdd HH:mm", CultureInfo.InvariantCulture)
+                    period.ToString("yyyyMMdd", CultureInfo.InvariantCulture)
                 };
                 line.AddRange(values.Select(v => v ?? string.Empty));
                 rows.Add(string.Join(",", line));
@@ -223,8 +211,8 @@ namespace QuantConnect.DataProcessing
         /// <summary>
         /// Pages one route for one balancing authority and demultiplexes the rows into their columns by
         /// the route's discriminator field. Asking for every series at once instead of one request per
-        /// series is what keeps the small authorities cheap: they have a handful of rows per quarter,
-        /// which used to cost twenty near-empty requests and now costs one.
+        /// series is what keeps the small authorities cheap: they have a handful of rows per day, which
+        /// used to cost twenty near-empty requests and now costs one.
         /// </summary>
         private void Collect(Dictionary<DateTime, string[]> grid, string route, string field,
             IReadOnlyDictionary<string, int> columns, string respondent, DateTime start, DateTime end)
@@ -267,9 +255,9 @@ namespace QuantConnect.DataProcessing
         /// <summary>Fetches one page of a route, retrying the transient failures a long backfill will hit.</summary>
         private List<JsonElement> FetchPage(string route, string respondent, DateTime start, DateTime end, int offset)
         {
-            var url = $"{ApiBaseUrl}/{route}/data/?api_key={_apiKey}&frequency=hourly&data[0]=value" +
-                      $"&facets[respondent][]={respondent}" +
-                      $"&start={start:yyyy-MM-dd}T00&end={end:yyyy-MM-dd}T00" +
+            var url = $"{ApiBaseUrl}/{route}/data/?api_key={_apiKey}&frequency=daily&data[0]=value" +
+                      $"&facets[respondent][]={respondent}&facets[timezone][]={Timezone}" +
+                      $"&start={start:yyyy-MM-dd}&end={end:yyyy-MM-dd}" +
                       $"&sort[0][column]=period&sort[0][direction]=asc" +
                       $"&offset={offset}&length={PageSize}";
 
@@ -368,10 +356,10 @@ namespace QuantConnect.DataProcessing
             return respondents.OrderBy(x => x, StringComparer.Ordinal).ToList();
         }
 
-        /// <summary>Parses an EIA hourly period ("2026-07-20T17") into a UTC operating hour.</summary>
+        /// <summary>Parses an EIA daily period ("2026-07-20") into the operating day.</summary>
         private static bool TryParsePeriod(string raw, out DateTime period)
         {
-            return DateTime.TryParseExact(raw, "yyyy-MM-ddTHH", CultureInfo.InvariantCulture,
+            return DateTime.TryParseExact(raw, "yyyy-MM-dd", CultureInfo.InvariantCulture,
                 DateTimeStyles.None, out period);
         }
 

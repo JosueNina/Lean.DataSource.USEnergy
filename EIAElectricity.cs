@@ -25,19 +25,19 @@ namespace QuantConnect.DataSource
 {
     /// <summary>
     /// U.S. electric grid operating data from EIA Form EIA-930, one record per balancing authority
-    /// per hour: demand, the day-ahead demand forecast, net generation, net interchange with
+    /// per day: demand, the day-ahead demand forecast, net generation, net interchange with
     /// neighbouring authorities, and the generation split across all sixteen fuel types the form
-    /// reports. Every value is in megawatthours.
+    /// reports. Every value is in megawatthours. The daily totals use the Eastern day boundary.
     /// </summary>
     public class EIAElectricity : BaseData
     {
         /// <summary>
-        /// The operating hour this record covers. Data lands in LEAN at <see cref="EndTime"/>, one
-        /// hour later, which is both the end of the bar and when EIA has published it.
+        /// The operating day this record covers. Data lands in LEAN at <see cref="EndTime"/>, one day
+        /// later, which is both the end of the bar and once EIA has published the completed day.
         /// </summary>
-        public TimeSpan Period => QuantConnect.Time.OneHour;
+        public TimeSpan Period => QuantConnect.Time.OneDay;
 
-        /// <summary>End of the operating hour. This is when LEAN delivers the data point.</summary>
+        /// <summary>End of the operating day. This is when LEAN delivers the data point.</summary>
         public override DateTime EndTime
         {
             get { return Time + Period; }
@@ -150,7 +150,7 @@ namespace QuantConnect.DataSource
         public EIAElectricity(string line)
         {
             var csv = line.Split(',');
-            Time = DateTime.ParseExact(csv[0], "yyyyMMdd HH:mm", CultureInfo.InvariantCulture);
+            Time = DateTime.ParseExact(csv[0], "yyyyMMdd", CultureInfo.InvariantCulture);
             Demand = ParseCell(csv[1]);
             DemandForecast = ParseCell(csv[2]);
             NetGeneration = ParseCell(csv[3]);
@@ -201,17 +201,17 @@ namespace QuantConnect.DataSource
             return new EIAElectricity(line) { Symbol = config.Symbol };
         }
 
-        /// <summary>Data time zone. The EIA-930 hourly periods are published in UTC.</summary>
-        public override DateTimeZone DataTimeZone() => TimeZones.Utc;
-
         /// <summary>
-        /// Supported resolutions. Hourly only: that is the cadence the form publishes and the one the
-        /// files are written at. An algorithm that wants a daily view consolidates these bars.
+        /// Data time zone. The daily EIA-930 totals use the Eastern day boundary, matching our other
+        /// U.S. agency datasets (BEA, CFTC, FINRA).
         /// </summary>
-        public override List<Resolution> SupportedResolutions() => new() { Resolution.Hour };
+        public override DateTimeZone DataTimeZone() => TimeZones.NewYork;
+
+        /// <summary>Supported resolutions. Daily, the cadence the data fleet processes at.</summary>
+        public override List<Resolution> SupportedResolutions() => DailyResolution;
 
         /// <summary>Default resolution.</summary>
-        public override Resolution DefaultResolution() => Resolution.Hour;
+        public override Resolution DefaultResolution() => Resolution.Daily;
 
         /// <summary>Sparse: one file per balancing authority, suppress missing-file logs.</summary>
         public override bool IsSparseData() => true;

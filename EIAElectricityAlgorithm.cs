@@ -23,28 +23,28 @@ namespace QuantConnect.DataLibrary.Tests
     /// <summary>
     /// Example algorithm using EIA-930 grid operations as a source of alpha. A single subscription for
     /// PJM carries demand, the day-ahead forecast, net generation, interchange and the full fuel mix.
-    /// The algorithm trades on load surprise: hours where actual demand runs above what PJM forecast a
-    /// day ahead mean the grid is tighter than the market expected. Grid data is a signal feed (not
-    /// tradeable), so the algorithm trades a separate, tradeable security (XLU, the utilities ETF).
+    /// The algorithm trades on load surprise: days where actual demand runs above what PJM forecast a
+    /// day ahead mean the grid was tighter than the market expected. Grid data is a signal feed (not
+    /// tradeable), so the algorithm trades a separate, tradeable security (SPY).
     /// </summary>
     public class EIAElectricityAlgorithm : QCAlgorithm
     {
         private Symbol _pjm;
-        private Symbol _xlu;
+        private Symbol _spy;
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates.
         /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2024, 1, 1);
-            SetEndDate(2024, 3, 1);
+            SetStartDate(2020, 6, 1);
+            SetEndDate(2020, 9, 1);
             SetCash(100000);
 
-            _xlu = AddEquity("XLU", Resolution.Hour).Symbol;
+            _spy = AddEquity("SPY", Resolution.Daily).Symbol;
 
             // One subscription for PJM carries every metric, via the readable helper.
-            _pjm = AddData<EIAElectricity>(EIA.BalancingAuthorities.PJM, Resolution.Hour).Symbol;
+            _pjm = AddData<EIAElectricity>(EIA.BalancingAuthorities.PJM, Resolution.Daily).Symbol;
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace QuantConnect.DataLibrary.Tests
                 return;
             }
 
-            // Load surprise as a fraction of the forecast, so it is comparable across hours.
+            // Load surprise as a fraction of the forecast, so it is comparable across days.
             var loadSurprise = (grid.Demand.Value - grid.DemandForecast.Value) / grid.DemandForecast.Value;
 
             decimal? gasShare = null;
@@ -74,18 +74,18 @@ namespace QuantConnect.DataLibrary.Tests
                 gasShare = grid.NaturalGas.Value / grid.NetGeneration.Value;
             }
 
-            Debug($"{Time:yyyy-MM-dd HH:mm} PJM - demand: {grid.Demand}, forecast: {grid.DemandForecast}, " +
+            Debug($"{Time:yyyy-MM-dd} PJM - demand: {grid.Demand}, forecast: {grid.DemandForecast}, " +
                   $"load surprise: {loadSurprise:F4}, gas share: {gasShare}");
 
-            // Demand running more than 2% above forecast is a tight grid: go long utilities.
+            // Demand running more than 2% above forecast is a tight grid: go long.
             // Demand undershooting by the same margin is slack: step aside.
             if (loadSurprise > 0.02m)
             {
-                SetHoldings(_xlu, 1);
+                SetHoldings(_spy, 1);
             }
             else if (loadSurprise < -0.02m)
             {
-                Liquidate(_xlu);
+                Liquidate(_spy);
             }
         }
 

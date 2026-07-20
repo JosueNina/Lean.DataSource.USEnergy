@@ -1,8 +1,8 @@
 ### Introduction
 
-The EIA Electricity dataset reports how the U.S. power grid actually ran, hour by hour. Every hour each balancing authority tells the Energy Information Administration how much electricity its region consumed, how much it had forecast a day earlier, how much it generated, how much it moved across its borders, and which fuels produced that generation. Coverage starts in 2019 and spans 81 balancing authorities, from the large market operators (PJM, ERCOT, CAISO, MISO, NYISO, ISO New England, SPP) down to individual utilities and the regional aggregates.
+The EIA Electricity dataset reports how the U.S. power grid actually ran, day by day. Every day each balancing authority tells the Energy Information Administration how much electricity its region consumed, how much it had forecast a day earlier, how much it generated, how much it moved across its borders, and which fuels produced that generation. Coverage starts in 2019 and spans 81 balancing authorities, from the large market operators (PJM, ERCOT, CAISO, MISO, NYISO, ISO New England, SPP) down to individual utilities and the regional aggregates.
 
-Electricity is where several macro stories become measurable before they show up in prices. A heat wave lands as a demand spike against a stale forecast. A cold snap shows up as gas burn. The energy transition shows up as coal losing share to wind and solar, hour by hour, region by region.
+Electricity is where several macro stories become measurable before they show up in prices. A heat wave lands as a demand spike against a stale forecast. A cold snap shows up as gas burn. The energy transition shows up as coal losing share to wind and solar, day by day, region by region.
 
 ### About the Provider
 
@@ -13,10 +13,10 @@ QuantConnect processes and caches the EIA-930 data so it is delivered to your al
 ### Getting Started
 
 ```python
-self._pjm = self.add_data(EIAElectricity, EIA.BalancingAuthorities.PJM, Resolution.HOUR).symbol
+self._pjm = self.add_data(EIAElectricity, EIA.BalancingAuthorities.PJM, Resolution.DAILY).symbol
 ```
 ```csharp
-_pjm = AddData<EIAElectricity>(EIA.BalancingAuthorities.PJM, Resolution.Hour).Symbol;
+_pjm = AddData<EIAElectricity>(EIA.BalancingAuthorities.PJM, Resolution.Daily).Symbol;
 ```
 
 ### Data Summary
@@ -26,11 +26,11 @@ _pjm = AddData<EIAElectricity>(EIA.BalancingAuthorities.PJM, Resolution.Hour).Sy
 | Start Date | January 2019 |
 | Asset Coverage | 81 US Balancing Authorities |
 | Data Density | Sparse |
-| Resolution | Hour |
-| Timezone | UTC |
-| Data Points | TBD — count from the full backfill |
+| Resolution | Daily |
+| Timezone | New York |
+| Data Points | TBD, count from the full backfill |
 
-A single `EIAElectricity` class carries everything one balancing authority reports for one hour:
+A single `EIAElectricity` class carries everything one balancing authority reports for one day:
 
 | Group | Fields |
 | --- | --- |
@@ -41,7 +41,7 @@ A single `EIAElectricity` class carries everything one balancing authority repor
 
 Every value is in megawatthours. The three headline metrics balance: net generation minus net interchange equals demand.
 
-Fields are nullable. A blank means the balancing authority does not report that series at all, which is a different statement from a zero. Small authorities report demand but no fuel split, and the storage and hybrid categories only exist in recent years, so a zero is a real reading (no wind generated this hour) while a null is an absence.
+Fields are nullable. A blank means the balancing authority does not report that series at all, which is a different statement from a zero. Small authorities report demand but no fuel split, and the storage and hybrid categories only exist in recent years, so a zero is a real reading (no wind generated that day) while a null is an absence.
 
 ### Example Applications
 
@@ -59,4 +59,4 @@ The EIA Electricity dataset provides `EIAElectricity` objects.
 
 ### Revisions
 
-EIA-930 values are preliminary when first published and are revised over the following days as balancing authorities finalize their numbers. QuantConnect ingests them as published, so a backtest sees what a live algorithm would have seen at that hour. The revision behavior is a property of the source.
+EIA-930 values are preliminary when first published and are revised over the following days as balancing authorities finalize their numbers. QuantConnect ingests them as published, so a backtest sees what a live algorithm would have seen that day. The revision behavior is a property of the source.
