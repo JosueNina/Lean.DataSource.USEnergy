@@ -27,7 +27,7 @@ ALIASES = {
     "SWPP": "SPP",
     "BPAT": "BPA",
     # PJM and MISO already read as the operator, but their legal name does not
-    # ("PJM Interconnection, LLC" -> PJMInterconnectionLLC), so alias them too.
+    # ("PJM Interconnection, LLC" -> PjmInterconnectionLlc), so alias them too.
     "PJM": "PJM",
     "MISO": "MISO",
 }
@@ -47,9 +47,10 @@ def xml_escape(text: str) -> str:
 
 
 def to_identifier(desc: str) -> str:
-    # PascalCase, like the USEnergy.Petroleum constants. Only the leading letter of each word is
-    # forced up, so acronyms survive: PowerSouth and LLC, not Powersouth and Llc.
-    ident = "".join(w[:1].upper() + w[1:] for w in re.split(r"[^0-9A-Za-z]+", desc.strip()) if w)
+    # PascalCase, the naming used across the datasets. Each word starts upper; a word the source
+    # wrote in full caps drops the rest, the way EODHD spells Gdp and USEnergy spells Spr.
+    words = [w for w in re.split(r"[^0-9A-Za-z]+", desc.strip()) if w]
+    ident = "".join(w.capitalize() if w.isupper() else w[:1].upper() + w[1:] for w in words)
     if ident and ident[0].isdigit():
         ident = "_" + ident
     return ident
