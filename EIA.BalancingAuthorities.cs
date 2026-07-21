@@ -29,183 +29,183 @@ namespace QuantConnect.DataSource
         public static class BalancingAuthorities
         {
             /// <summary>PowerSouth Energy Cooperative</summary>
-            public const string POWERSOUTH_ENERGY_COOPERATIVE = "AEC";
+            public const string PowerSouthEnergyCooperative = "AEC";
             /// <summary>Associated Electric Cooperative, Inc.</summary>
-            public const string ASSOCIATED_ELECTRIC_COOPERATIVE_INC = "AECI";
+            public const string AssociatedElectricCooperativeInc = "AECI";
             /// <summary>Avista Corporation</summary>
-            public const string AVISTA_CORPORATION = "AVA";
+            public const string AvistaCorporation = "AVA";
             /// <summary>Avangrid Renewables, LLC</summary>
-            public const string AVANGRID_RENEWABLES_LLC = "AVRN";
+            public const string AvangridRenewablesLLC = "AVRN";
             /// <summary>Arizona Public Service Company</summary>
-            public const string ARIZONA_PUBLIC_SERVICE_COMPANY = "AZPS";
+            public const string ArizonaPublicServiceCompany = "AZPS";
             /// <summary>Balancing Authority of Northern California</summary>
-            public const string BALANCING_AUTHORITY_OF_NORTHERN_CALIFORNIA = "BANC";
+            public const string BalancingAuthorityOfNorthernCalifornia = "BANC";
             /// <summary>Bonneville Power Administration</summary>
             public const string BPA = "BPAT";
             /// <summary>Bonneville Power Administration</summary>
-            public const string BONNEVILLE_POWER_ADMINISTRATION = "BPAT";
+            public const string BonnevillePowerAdministration = "BPAT";
             /// <summary>California</summary>
-            public const string CALIFORNIA = "CAL";
+            public const string California = "CAL";
             /// <summary>Carolinas</summary>
-            public const string CAROLINAS = "CAR";
+            public const string Carolinas = "CAR";
             /// <summary>Central</summary>
-            public const string CENTRAL = "CENT";
+            public const string Central = "CENT";
             /// <summary>Public Utility District No. 1 of Chelan County</summary>
-            public const string PUBLIC_UTILITY_DISTRICT_NO_1_OF_CHELAN_COUNTY = "CHPD";
+            public const string PublicUtilityDistrictNo1OfChelanCounty = "CHPD";
             /// <summary>California Independent System Operator</summary>
             public const string CAISO = "CISO";
             /// <summary>California Independent System Operator</summary>
-            public const string CALIFORNIA_INDEPENDENT_SYSTEM_OPERATOR = "CISO";
+            public const string CaliforniaIndependentSystemOperator = "CISO";
             /// <summary>Duke Energy Progress East</summary>
-            public const string DUKE_ENERGY_PROGRESS_EAST = "CPLE";
+            public const string DukeEnergyProgressEast = "CPLE";
             /// <summary>Duke Energy Progress West</summary>
-            public const string DUKE_ENERGY_PROGRESS_WEST = "CPLW";
+            public const string DukeEnergyProgressWest = "CPLW";
             /// <summary>Arlington Valley, LLC</summary>
-            public const string ARLINGTON_VALLEY_LLC = "DEAA";
+            public const string ArlingtonValleyLLC = "DEAA";
             /// <summary>PUD No. 1 of Douglas County</summary>
-            public const string PUD_NO_1_OF_DOUGLAS_COUNTY = "DOPD";
+            public const string PUDNo1OfDouglasCounty = "DOPD";
             /// <summary>Duke Energy Carolinas</summary>
-            public const string DUKE_ENERGY_CAROLINAS = "DUK";
+            public const string DukeEnergyCarolinas = "DUK";
             /// <summary>Electric Energy, Inc.</summary>
-            public const string ELECTRIC_ENERGY_INC = "EEI";
+            public const string ElectricEnergyInc = "EEI";
             /// <summary>El Paso Electric Company</summary>
-            public const string EL_PASO_ELECTRIC_COMPANY = "EPE";
+            public const string ElPasoElectricCompany = "EPE";
             /// <summary>Electric Reliability Council of Texas, Inc.</summary>
             public const string ERCOT = "ERCO";
             /// <summary>Electric Reliability Council of Texas, Inc.</summary>
-            public const string ELECTRIC_RELIABILITY_COUNCIL_OF_TEXAS_INC = "ERCO";
+            public const string ElectricReliabilityCouncilOfTexasInc = "ERCO";
             /// <summary>Florida</summary>
-            public const string FLORIDA = "FLA";
+            public const string Florida = "FLA";
             /// <summary>Florida Municipal Power Pool</summary>
-            public const string FLORIDA_MUNICIPAL_POWER_POOL = "FMPP";
+            public const string FloridaMunicipalPowerPool = "FMPP";
             /// <summary>Duke Energy Florida, Inc.</summary>
-            public const string DUKE_ENERGY_FLORIDA_INC = "FPC";
+            public const string DukeEnergyFloridaInc = "FPC";
             /// <summary>Florida Power &amp; Light Co.</summary>
-            public const string FLORIDA_POWER_LIGHT_CO = "FPL";
+            public const string FloridaPowerLightCo = "FPL";
             /// <summary>Public Utility District No. 2 of Grant County, Washington</summary>
-            public const string PUBLIC_UTILITY_DISTRICT_NO_2_OF_GRANT_COUNTY_WASHINGTON = "GCPD";
+            public const string PublicUtilityDistrictNo2OfGrantCountyWashington = "GCPD";
             /// <summary>GridLiance</summary>
-            public const string GRIDLIANCE = "GLHB";
+            public const string GridLiance = "GLHB";
             /// <summary>Gridforce Energy Management, LLC</summary>
-            public const string GRIDFORCE_ENERGY_MANAGEMENT_LLC = "GRID";
+            public const string GridforceEnergyManagementLLC = "GRID";
             /// <summary>Griffith Energy, LLC</summary>
-            public const string GRIFFITH_ENERGY_LLC = "GRIF";
+            public const string GriffithEnergyLLC = "GRIF";
             /// <summary>Gainesville Regional Utilities</summary>
-            public const string GAINESVILLE_REGIONAL_UTILITIES = "GVL";
+            public const string GainesvilleRegionalUtilities = "GVL";
             /// <summary>NaturEner Power Watch, LLC</summary>
-            public const string NATURENER_POWER_WATCH_LLC = "GWA";
+            public const string NaturEnerPowerWatchLLC = "GWA";
             /// <summary>New Harquahala Generating Company, LLC</summary>
-            public const string NEW_HARQUAHALA_GENERATING_COMPANY_LLC = "HGMA";
+            public const string NewHarquahalaGeneratingCompanyLLC = "HGMA";
             /// <summary>City of Homestead</summary>
-            public const string CITY_OF_HOMESTEAD = "HST";
+            public const string CityOfHomestead = "HST";
             /// <summary>Imperial Irrigation District</summary>
-            public const string IMPERIAL_IRRIGATION_DISTRICT = "IID";
+            public const string ImperialIrrigationDistrict = "IID";
             /// <summary>Idaho Power Company</summary>
-            public const string IDAHO_POWER_COMPANY = "IPCO";
+            public const string IdahoPowerCompany = "IPCO";
             /// <summary>ISO New England</summary>
             public const string ISONE = "ISNE";
             /// <summary>ISO New England</summary>
-            public const string ISO_NEW_ENGLAND = "ISNE";
+            public const string ISONewEngland = "ISNE";
             /// <summary>JEA</summary>
             public const string JEA = "JEA";
             /// <summary>Los Angeles Department of Water and Power</summary>
-            public const string LOS_ANGELES_DEPARTMENT_OF_WATER_AND_POWER = "LDWP";
+            public const string LosAngelesDepartmentOfWaterAndPower = "LDWP";
             /// <summary>LG&amp;E and KU Services Company as agent for Louisville Gas and Electric Company and Kentucky Utilities Company</summary>
-            public const string LG_E_AND_KU_SERVICES_COMPANY_AS_AGENT_FOR_LOUISVILLE_GAS_AND_ELECTRIC_COMPANY_AND_KENTUCKY_UTILITIES_COMPANY = "LGEE";
+            public const string LGEAndKUServicesCompanyAsAgentForLouisvilleGasAndElectricCompanyAndKentuckyUtilitiesCompany = "LGEE";
             /// <summary>Mid-Atlantic</summary>
-            public const string MID_ATLANTIC = "MIDA";
+            public const string MidAtlantic = "MIDA";
             /// <summary>Midwest</summary>
-            public const string MIDWEST = "MIDW";
+            public const string Midwest = "MIDW";
             /// <summary>Midcontinent Independent System Operator, Inc.</summary>
             public const string MISO = "MISO";
             /// <summary>Midcontinent Independent System Operator, Inc.</summary>
-            public const string MIDCONTINENT_INDEPENDENT_SYSTEM_OPERATOR_INC = "MISO";
+            public const string MidcontinentIndependentSystemOperatorInc = "MISO";
             /// <summary>New England</summary>
-            public const string NEW_ENGLAND = "NE";
+            public const string NewEngland = "NE";
             /// <summary>Nevada Power Company</summary>
-            public const string NEVADA_POWER_COMPANY = "NEVP";
+            public const string NevadaPowerCompany = "NEVP";
             /// <summary>Utilities Commission of New Smyrna Beach</summary>
-            public const string UTILITIES_COMMISSION_OF_NEW_SMYRNA_BEACH = "NSB";
+            public const string UtilitiesCommissionOfNewSmyrnaBeach = "NSB";
             /// <summary>Northwest</summary>
-            public const string NORTHWEST = "NW";
+            public const string Northwest = "NW";
             /// <summary>NorthWestern Corporation</summary>
-            public const string NORTHWESTERN_CORPORATION = "NWMT";
+            public const string NorthWesternCorporation = "NWMT";
             /// <summary>New York</summary>
-            public const string NEW_YORK = "NY";
+            public const string NewYork = "NY";
             /// <summary>New York Independent System Operator</summary>
             public const string NYISO = "NYIS";
             /// <summary>New York Independent System Operator</summary>
-            public const string NEW_YORK_INDEPENDENT_SYSTEM_OPERATOR = "NYIS";
+            public const string NewYorkIndependentSystemOperator = "NYIS";
             /// <summary>PacifiCorp East</summary>
-            public const string PACIFICORP_EAST = "PACE";
+            public const string PacifiCorpEast = "PACE";
             /// <summary>PacifiCorp West</summary>
-            public const string PACIFICORP_WEST = "PACW";
+            public const string PacifiCorpWest = "PACW";
             /// <summary>Portland General Electric Company</summary>
-            public const string PORTLAND_GENERAL_ELECTRIC_COMPANY = "PGE";
+            public const string PortlandGeneralElectricCompany = "PGE";
             /// <summary>PJM Interconnection, LLC</summary>
             public const string PJM = "PJM";
             /// <summary>PJM Interconnection, LLC</summary>
-            public const string PJM_INTERCONNECTION_LLC = "PJM";
+            public const string PJMInterconnectionLLC = "PJM";
             /// <summary>Public Service Company of New Mexico</summary>
-            public const string PUBLIC_SERVICE_COMPANY_OF_NEW_MEXICO = "PNM";
+            public const string PublicServiceCompanyOfNewMexico = "PNM";
             /// <summary>Public Service Company of Colorado</summary>
-            public const string PUBLIC_SERVICE_COMPANY_OF_COLORADO = "PSCO";
+            public const string PublicServiceCompanyOfColorado = "PSCO";
             /// <summary>Puget Sound Energy, Inc.</summary>
-            public const string PUGET_SOUND_ENERGY_INC = "PSEI";
+            public const string PugetSoundEnergyInc = "PSEI";
             /// <summary>South Carolina Public Service Authority</summary>
-            public const string SOUTH_CAROLINA_PUBLIC_SERVICE_AUTHORITY = "SC";
+            public const string SouthCarolinaPublicServiceAuthority = "SC";
             /// <summary>Dominion Energy South Carolina, Inc.</summary>
-            public const string DOMINION_ENERGY_SOUTH_CAROLINA_INC = "SCEG";
+            public const string DominionEnergySouthCarolinaInc = "SCEG";
             /// <summary>Seattle City Light</summary>
-            public const string SEATTLE_CITY_LIGHT = "SCL";
+            public const string SeattleCityLight = "SCL";
             /// <summary>Southeast</summary>
-            public const string SOUTHEAST = "SE";
+            public const string Southeast = "SE";
             /// <summary>Seminole Electric Cooperative</summary>
-            public const string SEMINOLE_ELECTRIC_COOPERATIVE = "SEC";
+            public const string SeminoleElectricCooperative = "SEC";
             /// <summary>Southeastern Power Administration</summary>
-            public const string SOUTHEASTERN_POWER_ADMINISTRATION = "SEPA";
+            public const string SoutheasternPowerAdministration = "SEPA";
             /// <summary>Sikeston Board of Municipal Utilities</summary>
-            public const string SIKESTON_BOARD_OF_MUNICIPAL_UTILITIES = "SIKE";
+            public const string SikestonBoardOfMunicipalUtilities = "SIKE";
             /// <summary>Southern Company Services, Inc. - Trans</summary>
-            public const string SOUTHERN_COMPANY_SERVICES_INC_TRANS = "SOCO";
+            public const string SouthernCompanyServicesIncTrans = "SOCO";
             /// <summary>Southwestern Power Administration</summary>
-            public const string SOUTHWESTERN_POWER_ADMINISTRATION = "SPA";
+            public const string SouthwesternPowerAdministration = "SPA";
             /// <summary>Salt River Project Agricultural Improvement and Power District</summary>
-            public const string SALT_RIVER_PROJECT_AGRICULTURAL_IMPROVEMENT_AND_POWER_DISTRICT = "SRP";
+            public const string SaltRiverProjectAgriculturalImprovementAndPowerDistrict = "SRP";
             /// <summary>Southwest</summary>
-            public const string SOUTHWEST = "SW";
+            public const string Southwest = "SW";
             /// <summary>Southwest Power Pool</summary>
             public const string SPP = "SWPP";
             /// <summary>Southwest Power Pool</summary>
-            public const string SOUTHWEST_POWER_POOL = "SWPP";
+            public const string SouthwestPowerPool = "SWPP";
             /// <summary>City of Tallahassee</summary>
-            public const string CITY_OF_TALLAHASSEE = "TAL";
+            public const string CityOfTallahassee = "TAL";
             /// <summary>Tampa Electric Company</summary>
-            public const string TAMPA_ELECTRIC_COMPANY = "TEC";
+            public const string TampaElectricCompany = "TEC";
             /// <summary>Tennessee</summary>
-            public const string TENNESSEE = "TEN";
+            public const string Tennessee = "TEN";
             /// <summary>Tucson Electric Power</summary>
-            public const string TUCSON_ELECTRIC_POWER = "TEPC";
+            public const string TucsonElectricPower = "TEPC";
             /// <summary>Texas</summary>
-            public const string TEXAS = "TEX";
+            public const string Texas = "TEX";
             /// <summary>Turlock Irrigation District</summary>
-            public const string TURLOCK_IRRIGATION_DISTRICT = "TIDC";
+            public const string TurlockIrrigationDistrict = "TIDC";
             /// <summary>City of Tacoma, Department of Public Utilities, Light Division</summary>
-            public const string CITY_OF_TACOMA_DEPARTMENT_OF_PUBLIC_UTILITIES_LIGHT_DIVISION = "TPWR";
+            public const string CityOfTacomaDepartmentOfPublicUtilitiesLightDivision = "TPWR";
             /// <summary>Tennessee Valley Authority</summary>
-            public const string TENNESSEE_VALLEY_AUTHORITY = "TVA";
+            public const string TennesseeValleyAuthority = "TVA";
             /// <summary>United States Lower 48</summary>
-            public const string UNITED_STATES_LOWER_48 = "US48";
+            public const string UnitedStatesLower48 = "US48";
             /// <summary>Western Area Power Administration - Rocky Mountain Region</summary>
-            public const string WESTERN_AREA_POWER_ADMINISTRATION_ROCKY_MOUNTAIN_REGION = "WACM";
+            public const string WesternAreaPowerAdministrationRockyMountainRegion = "WACM";
             /// <summary>Western Area Power Administration - Desert Southwest Region</summary>
-            public const string WESTERN_AREA_POWER_ADMINISTRATION_DESERT_SOUTHWEST_REGION = "WALC";
+            public const string WesternAreaPowerAdministrationDesertSouthwestRegion = "WALC";
             /// <summary>Western Area Power Administration - Upper Great Plains West</summary>
-            public const string WESTERN_AREA_POWER_ADMINISTRATION_UPPER_GREAT_PLAINS_WEST = "WAUW";
+            public const string WesternAreaPowerAdministrationUpperGreatPlainsWest = "WAUW";
             /// <summary>NaturEner Wind Watch, LLC</summary>
-            public const string NATURENER_WIND_WATCH_LLC = "WWA";
+            public const string NaturEnerWindWatchLLC = "WWA";
             /// <summary>Alcoa Power Generating, Inc. - Yadkin Division</summary>
-            public const string ALCOA_POWER_GENERATING_INC_YADKIN_DIVISION = "YAD";
+            public const string AlcoaPowerGeneratingIncYadkinDivision = "YAD";
         }
     }
 }

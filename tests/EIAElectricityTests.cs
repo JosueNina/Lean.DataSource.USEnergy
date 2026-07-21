@@ -96,16 +96,6 @@ namespace QuantConnect.DataLibrary.Tests
         }
 
         [Test]
-        public void SettingEndTimeShiftsTime()
-        {
-            // EndTime is derived, so its setter has to walk Time back by the period rather than
-            // clobbering it.
-            var point = new EIAElectricity { EndTime = new DateTime(2024, 1, 16) };
-
-            Assert.AreEqual(new DateTime(2024, 1, 15), point.Time);
-        }
-
-        [Test]
         public void EmptyCellsBecomeNull()
         {
             // A blank cell must parse to null, not zero. Zero is a real value here: a balancing

@@ -27,7 +27,7 @@ ALIASES = {
     "SWPP": "SPP",
     "BPAT": "BPA",
     # PJM and MISO already read as the operator, but their legal name does not
-    # ("PJM Interconnection, LLC" -> PJM_INTERCONNECTION_LLC), so alias them too.
+    # ("PJM Interconnection, LLC" -> PJMInterconnectionLLC), so alias them too.
     "PJM": "PJM",
     "MISO": "MISO",
 }
@@ -47,8 +47,9 @@ def xml_escape(text: str) -> str:
 
 
 def to_identifier(desc: str) -> str:
-    # Uppercase, keep alphanumerics, everything else -> underscore, collapse repeats.
-    ident = re.sub(r"[^0-9A-Za-z]+", "_", desc.strip().upper()).strip("_")
+    # PascalCase, like the USEnergy.Petroleum constants. Only the leading letter of each word is
+    # forced up, so acronyms survive: PowerSouth and LLC, not Powersouth and Llc.
+    ident = "".join(w[:1].upper() + w[1:] for w in re.split(r"[^0-9A-Za-z]+", desc.strip()) if w)
     if ident and ident[0].isdigit():
         ident = "_" + ident
     return ident
