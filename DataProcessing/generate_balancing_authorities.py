@@ -78,9 +78,10 @@ def main():
             entries.append((alias, code, name))
             seen.add(alias)
         ident = to_identifier(name)
-        # Disambiguate collisions by appending the code.
+        # Disambiguate collisions by appending the code, which keeps the casing EIA gives it: it
+        # is an identifier, not a word to title-case.
         if ident in seen:
-            ident = f"{ident}_{to_identifier(code)}"
+            ident = f"{ident}{re.sub(r'[^A-Za-z0-9]', '', code)}"
         seen.add(ident)
         entries.append((ident, code, name))
 
