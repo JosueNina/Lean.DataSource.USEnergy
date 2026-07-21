@@ -9,6 +9,8 @@
     <Compile Include="..\USEnergyInformationAdministrationAlgorithm.cs" Link="USEnergyInformationAdministrationAlgorithm.cs" />
     <Content Include="..\CachedUSEnergyDataAlgorithm.py" Link="CachedUSEnergyDataAlgorithm.py" />
     <Content Include="..\USEnergyInformationAdministrationAlgorithm.py" Link="USEnergyInformationAdministrationAlgorithm.py" />
+    <Compile Include="..\EIAElectricityAlgorithm.cs" Link="EIAElectricityAlgorithm.cs" />
+    <Content Include="..\EIAElectricityAlgorithm.py" Link="EIAElectricityAlgorithm.py" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NUnit" Version="4.2.2" />
